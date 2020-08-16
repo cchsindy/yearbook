@@ -61,7 +61,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import FirebaseService from './firebase'
 import StripeService from './stripe'
 
 export default {
@@ -81,6 +81,7 @@ export default {
       release: '',
       message: '',
       showSubmit: true,
+      firebase: null,
       stripe: null,
     }
   },
@@ -119,53 +120,53 @@ export default {
         '<h2>Thank you so much!</h2><p>Yearbooks should arrive by August 30.</p>'
       html += '</body></html>'
       let data = {
-        firstName: this.firstname,
-        lastName: this.lastname,
-        address: this.address,
-        city: this.city,
-        state: this.state,
-        zip: this.zipcode,
-        email: this.email,
-        phone: this.phone,
-        books: this.books,
-        students: this.students,
-        amount: this.amount,
-        description: '2019-2020 Yearbook Order',
-        html,
+        order: {
+          firstName: this.firstname,
+          lastName: this.lastname,
+          address: this.address,
+          city: this.city,
+          state: this.state,
+          zip: this.zipcode,
+          email: this.email,
+          phone: this.phone,
+          books: this.books,
+          students: this.students,
+          amount: this.amount,
+          date: new Date().toString(),
+        },
+        email: {
+          subject: '2019-2020 Yearbook Order',
+          html,
+          recipients: [{ address: this.email }],
+        },
       }
-      // axios
-      //   .post('https://us-central1-my-covenant.cloudfunctions.net/creditCard', {
-      //     data,
-      //   })
-      //   .then((result) => {
-      //     this.message = result.data.description
-      //     if (result.data.responseCode != 1) {
-      //       this.message += ' Please fix your information above and try again.'
-      //       this.showSubmit = true
-      //     }
-      //     if (result.data.transactionId) {
-      //       data.transactionId = result.data.transactionId
-      //       axios
-      //         .post(
-      //           'https://us-central1-my-covenant.cloudfunctions.net/yearbook',
-      //           {
-      //             data,
-      //           }
-      //         )
-      //         .then((result) => {
-      //           this.message = result.data
-      //         })
-      //         .catch(() => {
-      //           this.message = 'Could not complete your registration.'
-      //         })
-      //     }
-      //   })
-      //   .catch(() => {
-      //     this.message = 'This operation is currently unavailable.'
-      //   })
+      this.stripe.method().then((method) => {
+        if (method.error) {
+          this.message = method.error.message
+          this.showSubmit = true
+        } else {
+          this.firebase
+            .stripePay({
+              amount: parseInt(this.amount * 100),
+              paymentMethodId: method.paymentMethod.id,
+            })
+            .then((pi) => {
+              this.stripe.intent(pi.data).then((intent) => {
+                if (intent.paymentIntent.id) {
+                  data.order.paymentId = intent.paymentIntent.id
+                  this.firebase.saveOrder(data).then(() => {
+                    this.message =
+                      'Thank you for your order! Check your email for a receipt.'
+                  })
+                }
+              })
+            })
+        }
+      })
     },
   },
   mounted() {
+    this.firebase = new FirebaseService()
     this.stripe = new StripeService(this.$refs.creditcard)
   },
 }

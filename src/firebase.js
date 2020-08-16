@@ -1,5 +1,4 @@
 import firebase from 'firebase/app'
-import 'firebase/firestore'
 import 'firebase/functions'
 
 export default class FirebaseService {
@@ -13,8 +12,13 @@ export default class FirebaseService {
       messagingSenderId: '945207168321',
       appId: '1:945207168321:web:c3bb4aa02f11e1444e65c0',
     })
-    this.firestore = this.app.firestore()
+    this.order = firebase.functions().httpsCallable('yearbookOrder')
     this.pay = firebase.functions().httpsCallable('stripePayment')
+  }
+
+  async saveOrder(data) {
+    const order = await this.order(data)
+    return order
   }
 
   async stripePay(data) {
