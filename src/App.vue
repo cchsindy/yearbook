@@ -3,17 +3,13 @@
     <div class="header"></div>
     <div class="content">
       <h1>Order your copy of the Covenant Keeper!</h1>
-      <p>Please complete this form to order your 2019-20 yearbook.</p>
-      <p>
-        Orders must be placed by Monday, August 5. Yearbooks should arrive by
-        August 30. Orders placed individually through Shutterfly will result in
-        a significant price increase.
-      </p>
+      <p>Thank you for your patience as we worked to make last year's yearbook complete with 2020 graduation photos. Please complete this form to order your 2019-20 yearbook.</p>
+      <p>Orders must be placed by Monday, August 31. Yearbooks should arrive before the end of October. Orders placed individually through Shutterfly will result in a significant price increase.</p>
       <p>
         Questions? Email
-        <a href="mailto:studentpublications@covenantchristian.org"
-          >studentpublications@covenantchristian.org</a
-        >.
+        <a
+          href="mailto:studentpublications@covenantchristian.org"
+        >studentpublications@covenantchristian.org</a>.
       </p>
       <h1>Yearbook Order</h1>
       <form v-on:submit.prevent>
@@ -61,64 +57,64 @@
 </template>
 
 <script>
-import FirebaseService from './firebase'
-import StripeService from './stripe'
+import FirebaseService from "./firebase";
+import StripeService from "./stripe";
 
 export default {
-  name: 'app',
+  name: "app",
   data: () => {
     return {
-      lastname: '',
-      firstname: '',
-      address: '',
-      city: '',
-      state: '',
-      zipcode: '',
-      email: '',
-      phone: '',
-      books: '1',
-      students: '',
-      release: '',
-      message: '',
+      lastname: "",
+      firstname: "",
+      address: "",
+      city: "",
+      state: "",
+      zipcode: "",
+      email: "",
+      phone: "",
+      books: "1",
+      students: "",
+      release: "",
+      message: "",
       showSubmit: true,
       firebase: null,
       stripe: null,
-    }
+    };
   },
   computed: {
     invalid() {
-      let invalid = false
+      let invalid = false;
       if (
-        this.lastname === '' ||
-        this.firstname === '' ||
-        this.address === '' ||
-        this.city === '' ||
-        this.state === '' ||
-        this.zipcode === '' ||
-        this.email === '' ||
-        this.phone === '' ||
-        this.books === '' ||
-        this.make === '' ||
-        this.students === ''
+        this.lastname === "" ||
+        this.firstname === "" ||
+        this.address === "" ||
+        this.city === "" ||
+        this.state === "" ||
+        this.zipcode === "" ||
+        this.email === "" ||
+        this.phone === "" ||
+        this.books === "" ||
+        this.make === "" ||
+        this.students === ""
       )
-        invalid = true
-      return invalid
+        invalid = true;
+      return invalid;
     },
     amount() {
-      return (this.books * 70).toFixed(2)
+      return (this.books * 70).toFixed(2);
     },
   },
   methods: {
     purchase() {
-      this.showSubmit = false
-      this.message = 'Processing...'
-      let html = '<html><body>'
-      html += '<h1>2019-2020 Yearbook Order</h1>'
-      html += '<h2>Details</h2>'
-      html += `<p>Yearbooks: ${this.books}</p><p>Students: ${this.students}</p>`
+      this.showSubmit = false;
+      this.message = "Processing...";
+      let html = "<html><body>";
+      html += "<h1>2019-2020 Yearbook Order</h1>";
+      html += "<h2>Details</h2>";
+      html += `<p>Yearbook(s): ${this.books}</p><p>Student(s): ${this.students}</p>`;
       html +=
-        '<h2>Thank you so much!</h2><p>Yearbooks should arrive by August 30.</p>'
-      html += '</body></html>'
+        "<h2>Thank you so much!</h2><p>Yearbooks should arrive by the end of October.</p>";
+      html += "</body></html>";
       let data = {
         order: {
           firstName: this.firstname,
@@ -135,15 +131,15 @@ export default {
           date: new Date().toString(),
         },
         email: {
-          subject: '2019-2020 Yearbook Order',
+          subject: "2019-2020 Yearbook Order",
           html,
           recipients: [{ address: this.email }],
         },
-      }
+      };
       this.stripe.method().then((method) => {
         if (method.error) {
-          this.message = method.error.message
-          this.showSubmit = true
+          this.message = method.error.message;
+          this.showSubmit = true;
         } else {
           this.firebase
             .stripePay({
@@ -153,28 +149,28 @@ export default {
             .then((pi) => {
               this.stripe.intent(pi.data).then((intent) => {
                 if (intent.paymentIntent.id) {
-                  data.order.paymentId = intent.paymentIntent.id
+                  data.order.paymentId = intent.paymentIntent.id;
                   this.firebase.saveOrder(data).then(() => {
                     this.message =
-                      'Thank you for your order! Check your email for a receipt.'
-                  })
+                      "Thank you for your order! Check your email for a receipt.";
+                  });
                 }
-              })
-            })
+              });
+            });
         }
-      })
+      });
     },
   },
   mounted() {
-    this.firebase = new FirebaseService()
-    this.stripe = new StripeService(this.$refs.creditcard)
+    this.firebase = new FirebaseService();
+    this.stripe = new StripeService(this.$refs.creditcard);
   },
-}
+};
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css?family=Oswald');
-@import url('https://fonts.googleapis.com/css?family=Work+Sans');
+@import url("https://fonts.googleapis.com/css?family=Oswald");
+@import url("https://fonts.googleapis.com/css?family=Work+Sans");
 
 html,
 body {
@@ -187,12 +183,12 @@ h1 {
 }
 input {
   display: inline-block;
-  font-family: 'Work Sans', sans-serif;
+  font-family: "Work Sans", sans-serif;
   font-size: 1em;
   padding: 0.5vw;
   width: 50vw;
 }
-input[type='submit'] {
+input[type="submit"] {
   background: #eee;
   border: solid 1px #777;
   border-radius: 1vw;
@@ -203,7 +199,7 @@ input[type='submit'] {
   text-transform: uppercase;
   width: auto;
 }
-input[type='submit']:disabled {
+input[type="submit"]:disabled {
   border: solid 1px #ccc;
 }
 label {
@@ -217,7 +213,7 @@ span {
   font-style: italic;
 }
 textarea {
-  font-family: 'Work Sans', sans-serif;
+  font-family: "Work Sans", sans-serif;
   font-size: 1em;
   margin-top: 2px;
   padding: 0.5vw;
@@ -225,7 +221,7 @@ textarea {
   width: 50vw;
 }
 #app {
-  font-family: 'Work Sans', sans-serif;
+  font-family: "Work Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -243,7 +239,7 @@ textarea {
   max-width: 500px;
 }
 .header {
-  background-image: url('./assets/keeper.png');
+  background-image: url("./assets/keeper.png");
   background-position: center;
   background-size: cover;
   height: 50vh;
