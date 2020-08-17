@@ -15,8 +15,8 @@ export default class StripeService {
   }
 
   async load() {
-    // pk_live_fIxJlqxQbJRICEasZvxs2QK600EmFoZAiO
-    this.stripe = await loadStripe('pk_test_wgPmrDXSBM6AamX7WP2VqBjq00wuxOvppL')
+    // this.stripe = await loadStripe('pk_test_wgPmrDXSBM6AamX7WP2VqBjq00wuxOvppL')
+    this.stripe = await loadStripe('pk_live_fIxJlqxQbJRICEasZvxs2QK600EmFoZAiO')
     this.elements = this.stripe.elements()
     const style = {
       base: {
