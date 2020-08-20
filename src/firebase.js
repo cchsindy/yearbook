@@ -25,6 +25,7 @@ export default class FirebaseService {
     const payment = await this.pay({
       description: 'Yearbook Order',
       amount: data.amount,
+      email: data.email,
       paymentMethodId: data.paymentMethodId,
     })
     return payment

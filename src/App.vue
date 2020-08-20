@@ -144,6 +144,7 @@ export default {
           this.firebase
             .stripePay({
               amount: parseInt(this.amount * 100),
+              email: this.email,
               paymentMethodId: method.paymentMethod.id,
             })
             .then((pi) => {
